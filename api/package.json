@@ -1,0 +1,21 @@
+{
+  "name": "broccoli",
+  "version": "1.0.0",
+  "description": "cycling and weather ",
+  "main": "index.js",
+  "author": "rama41222",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "typescript": "^4.3.5"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.1",
+    "@types/node": "^15.14.0",
+    "rimraf": "^3.0.2"
+  }
+}
