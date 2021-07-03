@@ -2,6 +2,7 @@ import { Response, Request } from 'express';
 import { fetchWeather, bikesTransformer } from '../../../services';
 import Station from './models/station.model';
 import { StationDocument } from './station.types';
+import { parseWeather, parseStations } from './station.service';
 
 const fetchAllStations = async (
   req: Request,
@@ -18,23 +19,25 @@ const fetchAllStations = async (
 
   const date = new Date(at as string);
 
+  if (!date) {
+    return res.status(404).json({ message: 'Invalid parameter: at' });
+  }
+
+  const totalPages = await Station.count({ createdAt: { $gte: date } });
+
+  if (totalPages <= 0) {
+    return res.status(404).json({ message: `No records found for at: ${at}` });
+  }
+
   const rawStations = await Station.find({ createdAt: { $gte: date } })
     .skip(startPage)
     .limit(noOfpages)
     .populate('weather')
     .sort({ createdAt: -1 });
-  const totalPages = await Station.count({ createdAt: { $gte: date } });
-  const weather = await rawStations[0].weather.toObject();
-  Reflect.deleteProperty(weather, '__v');       
-  Reflect.deleteProperty(weather, '_id');
-  Reflect.deleteProperty(weather, 'createdAt');
-  Reflect.deleteProperty(weather, 'updatedAt');
-  const stations = rawStations.map(({ geometry, properties, type }: StationDocument) => ({
-    geometry,
-    properties,
-    type,
-  }));
-  return res.status(200).json({ at, stations , weather, total: totalPages });
+
+  const weather = parseWeather(await rawStations[0].weather.toObject());
+  const stations = parseStations(rawStations);
+  return res.status(200).json({ at, stations, weather, total: totalPages });
 };
 
 const fetchStationById = async (
@@ -46,5 +49,3 @@ const fetchStationById = async (
 };
 
 export { fetchAllStations, fetchStationById };
-
-
