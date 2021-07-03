@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { fetchStations } from './station.controller';
+import { fetchAllStations, fetchStationById } from './station.controller';
 
 const stationRouter = Router();
 
-stationRouter.get('/', fetchStations);
+stationRouter.get('/:id', fetchStationById);
+stationRouter.get('/', fetchAllStations);
 
 export default stationRouter;

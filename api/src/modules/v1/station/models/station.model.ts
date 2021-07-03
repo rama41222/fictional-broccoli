@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { StationDocument } from "../station.types";
+import Weather from './weather.model';
 
 const StationSchema = new mongoose.Schema(
     {
@@ -11,7 +12,7 @@ const StationSchema = new mongoose.Schema(
         },
         weather: {
             type: String,
-            ref: 'Weatehr'
+            ref: Weather
         },
         type: { 
             type: String,

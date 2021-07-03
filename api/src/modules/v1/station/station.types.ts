@@ -18,9 +18,14 @@ interface StationDocument extends mongoose.Document {
     updatedAt: Date;
 }
   
+enum TimeFrequency {
+    Hourly = 'hourly',
+    Daily = 'daily'  
+}
 
 export {
     StationResponse,
     StationDocument,
-    WeatherDocument
+    WeatherDocument,
+    TimeFrequency
 }

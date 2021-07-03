@@ -8,8 +8,8 @@ import v1 from './modules/v1';
 dotenv.config();
 const app = express();
 
-connect(DbType.Mongo).then(data => {
-    syncToHost.start();
+connect(DbType.Mongo).then(async (data) => {
+    // await syncToHost.start();
 }).catch(e => {
     console.error('Cron jobs can\'t be started :=> \n', e.message);
 });
