@@ -78,7 +78,7 @@
   version "1.0.1"
   resolved "https://registry.npmjs.org/@tsconfig/node16/-/node16-1.0.1.tgz"
 
-"@types/body-parser@*", "@types/body-parser@^1.19.0":
+"@types/body-parser@*":
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.0.tgz#0685b3c47eb3006ffed117cdd55164b61f80538f"
   dependencies:
@@ -1294,7 +1294,7 @@ moment-timezone@^0.5.x:
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@>=2.14.0:
+"moment@>= 2.9.0", moment@>=2.14.0, moment@^2.29.1:
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
 

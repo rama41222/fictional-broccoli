@@ -3,7 +3,7 @@ import { bikesTransformer, fetchWeather } from './../services';
 import Station from './../modules/v1/station/models/station.model'
 import Weather from './../modules/v1/station/models/weather.model'
 
-const syncToHost = new CronJob('* * * * *', async() => {
+const syncToHost = new CronJob('0 */1 * * *', async() => {
     const at = new Date();
     const weather = await fetchWeather(process.env.WEATHER_API as string);
     const newWeather = await Weather.create(weather);
