@@ -16,18 +16,6 @@ connect(DbType.Mongo).then(data => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get('/', async(req, res) => {
-    const [
-        weather, 
-        stations
-    ] = await Promise.all([
-        fetchWeather(process.env.WEATHER_API as string),
-        fetchBikes(process.env.BIKE_SHARING_API as string)
-    ]) ;
-    res.status(200).json({ at: new Date(), weather, stations });
-});
-
 app.use(v1);
 
 app.listen(process.env.PORT, () => {

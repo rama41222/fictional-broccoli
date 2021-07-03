@@ -1,7 +1,8 @@
-import  fetchBikes from './bikes.service';
+import  {fetchBikes, bikesTransformer } from './bikes.service';
 import fetchWeather from './weather.service';
 
 export {
     fetchBikes,
+    bikesTransformer,
     fetchWeather
 }

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import  stationRouter from './stations/station.routes';
+import  stationRouter from './station/station.routes';
 
 const v1 = Router();
 const version = 'v1';
