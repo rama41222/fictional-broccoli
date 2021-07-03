@@ -1,7 +1,5 @@
 import { Response, Request } from 'express';
-import { fetchWeather, bikesTransformer } from '../../../services';
 import Station from './models/station.model';
-import { StationDocument } from './station.types';
 import { parseWeather, parseStations } from './station.service';
 
 const fetchAllStations = async (
@@ -37,6 +35,7 @@ const fetchAllStations = async (
 
   const weather = parseWeather(await rawStations[0].weather.toObject());
   const stations = parseStations(rawStations);
+
   return res.status(200).json({ at, stations, weather, total: totalPages });
 };
 
