@@ -16,6 +16,7 @@ interface StationDocument extends mongoose.Document {
     type: string;
     createdAt: Date;
     updatedAt: Date;
+    at: Date;
 }
   
 enum TimeFrequency {

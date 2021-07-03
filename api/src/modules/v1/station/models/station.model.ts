@@ -18,6 +18,10 @@ const StationSchema = new mongoose.Schema(
             type: String,
             required: true 
         },
+        at: {
+            type: Date,
+            required: true
+        }
     },
     { timestamps: true }
   );
