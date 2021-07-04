@@ -1,3 +1,4 @@
+import moment from 'moment-timezone';
 import fetch, { Response } from 'node-fetch';
 import { TransformType } from './types.service';
 
@@ -11,7 +12,7 @@ const fetchBikes = async (url: string): Promise<any> => {
 const bikesTransformer = async (
   data: TransformType,
   weather: string,
-  at: Date
+  at: moment.Moment
 ): Promise<void | Record<string, any>> => {
   try {
     const { features } = await fetchBikes(
@@ -24,7 +25,7 @@ const bikesTransformer = async (
             ...feature,
             stationId: feature.properties.id,
             weather,
-            at
+            at: at.toDate()
           };
         }
       });

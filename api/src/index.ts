@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 
 connect(DbType.Mongo).then(async (data) => {
-    // await syncToHost.start();
+    await syncToHost.start();
 }).catch(e => {
     console.error('Cron jobs can\'t be started :=> \n', e.message);
 });

@@ -1,11 +1,15 @@
 import mongoose, { LeanDocument } from 'mongoose';
-import { WeatherDocument, StationDocument, TimeFrequency } from './station.types';
+import {
+  WeatherDocument,
+  StationDocument,
+  TimeFrequency,
+} from './station.types';
 import Station from './models/station.model';
 import { parseWeather, parseStations } from './station.helper';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 const fetchRecordsByAt = async (
-  at: Date,
+  at: moment.Moment,
   startPage: number,
   noOfpages: number
 ): Promise<{
@@ -14,17 +18,19 @@ const fetchRecordsByAt = async (
   weather: Partial<LeanDocument<WeatherDocument>>;
   totalPages: number;
 }> => {
-  const totalPages = await Station.countDocuments({ at: { $gte: at } });
+  const totalPages = await Station.countDocuments({
+    at: { $gte: at.toDate() },
+  });
 
   if (totalPages <= 0) {
-    return { at, stations: [], weather: {}, totalPages: 0 };
+    return { at: at.toDate(), stations: [], weather: {}, totalPages: 0 };
   }
 
-  const rawStations = await Station.find({ at: { $gte: at } })
+  const rawStations = await Station.find({ at: { $gte: at.toDate() } })
     .skip(startPage)
     .limit(noOfpages)
     .populate('weather')
-    .sort({ at: -1 });
+    .sort({ at: 1 });
 
   const tempWeather = await rawStations[0].weather.toObject();
   const timeStamp = await rawStations[0].at;
@@ -35,7 +41,7 @@ const fetchRecordsByAt = async (
 
 const fetchRecordsByAtById = async (
   id: number,
-  at: Date,
+  at: moment.Moment,
   startPage: number,
   noOfpages: number
 ): Promise<{
@@ -46,21 +52,21 @@ const fetchRecordsByAtById = async (
 }> => {
   const totalPages = await Station.countDocuments({
     stationId: id,
-    at: { $gte: at },
+    at: { $gte: at.toDate() },
   });
 
   if (totalPages <= 0) {
-    return { at, stations: [], weather: {}, totalPages: 0 };
+    return { at: at.toDate(), stations: [], weather: {}, totalPages: 0 };
   }
 
   const rawStations = await Station.find({
     stationId: id,
-    at: { $gte: at },
+    at: { $gte: at.toDate() },
   })
     .skip(startPage)
     .limit(noOfpages)
     .populate('weather')
-    .sort({ at: -1 });
+    .sort({ at: 1 });
 
   const tempWeather = await rawStations[0].weather.toObject();
   const timeStamp = await rawStations[0].at;
@@ -71,117 +77,88 @@ const fetchRecordsByAtById = async (
 
 const fetchRecordsByDateRangeAndFrequency = async (
   id: number,
-  from: Date,
-  to: Date,
-  startPage: number,
-  noOfpages: number,
+  from: moment.Moment,
+  to: moment.Moment,
   frequency: TimeFrequency
-) => {
-
-  // const totalPages = await Station.countDocuments({
-  //   stationId: id,
-  //   $and: [{ at: { $gte: from }}, { at:  { $lte: to }}],
-  // });
-
-  // if (totalPages <= 0) {
-  //   return { at: from, stations: [], weather: {}, totalPages: 0 };
-  // }
+): Promise<[] | Partial<StationDocument>[]> => {
 
   const rawStations = await Station.find({
-    stationId: id,
-    $and: [{ at: { $gte: from }}, {at:  { $lte: to }}],
+    $and: [
+      { stationId: id },
+      { at: { $gte: from.toDate(), $lte: to.toDate() } },
+    ],
   })
-    .skip(startPage)
-    .limit(noOfpages)
     .populate('weather')
-    .sort({ at: -1 });
+    .sort({ at: 1 });
 
-  // const tempWeather = await rawStations[0].weather.toObject();
-  // const timeStamp = await rawStations[0].at;
-  // const weather = parseWeather(tempWeather);
-  // const stations = parseStations(rawStations);
+  if (!rawStations || rawStations.length <= 0) {
+    return [];
+  }
+
   const result = await calculateFrequency(id, rawStations, from, to, frequency);
+  
+  if (!result || result.length <= 0) {
+    return [];
+  }
+
   return result;
 };
 
-const calculateFrequency = async (id: number,rawStations: Array<Partial<StationDocument>>, from: Date , to: Date, frequency: TimeFrequency) => {
- 
-  const a = moment(from);
-  const b = moment(to);
-  const records: Partial<StationDocument>[] = []
-
-  console.log('frequency', frequency)
+const calculateFrequency = async (
+  id: number,
+  rawStations: Array<Partial<StationDocument>>,
+  from: moment.Moment,
+  to: moment.Moment,
+  frequency: TimeFrequency
+): Promise<Partial<StationDocument>[]> => {
+  const records: Partial<StationDocument>[] = [];
 
   if (frequency === TimeFrequency.Hourly) {
-    
-    console.log('in hours');
-    const roundedStartTime = a.endOf('hour');
-    const roundedEndTime = b.endOf('hour');
+    const roundedStartTime = from.endOf('hour');
+    const roundedEndTime = to.endOf('hour');
     const hours = roundedEndTime.diff(roundedStartTime, 'hours');
-    
-    console.log('roundedStartTime', roundedStartTime);
-    console.log('roundedEndTime', roundedEndTime);
-    console.log('hours', hours);
-    
-    for(let i = 1; i <= hours; i++) {
-      console.log(i);
-      let p = roundedStartTime.toDate().getTime();
-      rawStations.find(station => {
-        const z = moment(station.at).toDate().getTime();
+
+    let p = roundedStartTime.toDate().getTime();
+    for (let i = 1; i <= hours; i++) {
+      for (const station of rawStations) {
+        const z = moment.tz(station.at, 'EST').toDate().getTime();
         const x = p;
-        const y = moment(p + (60 * 60 * 1000)).toDate().getTime()
-
-        console.log('---------------')
-        console.log('x', moment(x).toString())
-        console.log('z', moment(z).toString())
-        console.log('y', moment(y).toString())
-        console.log('---------------')
-
+        const y = moment
+          .tz(p + 60 * 60 * 1000, 'EST')
+          .toDate()
+          .getTime();
         if (x <= z && z <= y) {
-          console.log('station', station.at)
           records.push(station);
+          break;
         }
-        p += (60 * 60 * 1000);
-      })
+      }
+      p += 60 * 60 * 1000;
     }
   }
 
   if (frequency === TimeFrequency.Daily) {
-    
-    console.log('in days');
-    const roundedStartTime = a.endOf('day');
-    const roundedEndTime = b.endOf('day');
+    const roundedStartTime = from.endOf('day');
+    const roundedEndTime = to.endOf('day');
     const days = roundedEndTime.diff(roundedStartTime, 'days');
-    
-    console.log('roundedStartTime', roundedStartTime);
-    console.log('roundedEndTime', roundedEndTime);
-    console.log('days', days);
-    
-    for(let i = 1; i <= days; i++) {
-      console.log(i);
-      let p = roundedStartTime.toDate().getTime();
-      rawStations.find(station => {
-        const z = moment(station.at).toDate().getTime();
+    let p = roundedStartTime.toDate().getTime();
+    for (let i = 1; i <= days; i++) {
+      for (const station of rawStations) {
+        const z = moment.tz(station.at, 'EST').toDate().getTime();
         const x = p;
-        const y = moment(p + (60 * 60 * 1000 * 24)).toDate().getTime()
-
-        console.log('---------------')
-        console.log('x', moment(x).toString())
-        console.log('z', moment(z).toString())
-        console.log('y', moment(y).toString())
-        console.log('---------------')
-
+        const y = moment
+          .tz(p + 60 * 60 * 1000 * 24, 'EST')
+          .toDate()
+          .getTime();
         if (x <= z && z <= y) {
-          console.log('station', station.at)
           records.push(station);
+          break;
         }
-        p += (60 * 60 * 1000 * 24);
-      })
+      }
+      p += 60 * 60 * 1000 * 24;
     }
-    
   }
   return records;
-}
+};
 
 export {
   fetchRecordsByAt,

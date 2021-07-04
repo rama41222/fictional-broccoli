@@ -1,4 +1,5 @@
 import { Response, Request } from 'express';
+import moment from 'moment-timezone';
 
 import {
   fetchRecordsByAt,
@@ -23,7 +24,7 @@ const fetchAllStations = async (
         .json({ message: 'Query param missing: at or Invalid parameter: at' });
     }
 
-    const date = new Date(at as string);
+    const date = moment.tz(at as string, 'EST');
     const result = await fetchRecordsByAt(date, startPage, noOfPages);
 
     if (result.totalPages <= 0) {
@@ -57,7 +58,7 @@ const fetchStationById = async (
     const formattedId = parseInt(id as string) || -1;
 
     if (at) {
-      const date = new Date(at as string);
+      const date = moment.tz(at as string, 'EST');
       const result = await fetchRecordsByAtById(
         formattedId,
         date,
@@ -73,23 +74,25 @@ const fetchStationById = async (
     }
 
     if (from && to) {
-      const fromDate = new Date(from as string);
-      const toDate = new Date(to as string);
+      
+      const fromDate = moment.tz(from as string, 'EST');
+      const toDate = moment.tz(to as string, 'EST');
+
       const result = await fetchRecordsByDateRangeAndFrequency(
         formattedId,
         fromDate,
         toDate,
-        startPage,
-        noOfPages,
         frequency as TimeFrequency
       );
 
-      // if (result.totalPages <= 0) {
-      //   return res
-      //     .status(404)
-      //     .json({ message: `No Records found for: ${fromDate} and ${toDate}` });
-      // }
-      return res.status(200).json(result);
+      if (result.length <= 0) {
+        return res
+          .status(404)
+          .json({ message: `No Records found for: ${fromDate} and ${toDate}` });
+      }
+      return res
+        .status(404)
+        .json({ message: `No Records found for: ${fromDate} and ${toDate}` });
     }
     return res.status(200).json({});
   } catch (e) {
