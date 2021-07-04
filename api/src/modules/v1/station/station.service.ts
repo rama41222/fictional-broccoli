@@ -109,48 +109,78 @@ const calculateFrequency = async (id: number,rawStations: Array<Partial<StationD
   const a = moment(from);
   const b = moment(to);
   const records: Partial<StationDocument>[] = []
-  console.log('frequency', frequency)
-  if (frequency === TimeFrequency.Hourly) {
-    console.log('in hours');
 
+  console.log('frequency', frequency)
+
+  if (frequency === TimeFrequency.Hourly) {
+    
+    console.log('in hours');
     const roundedStartTime = a.endOf('hour');
     const roundedEndTime = b.endOf('hour');
     const hours = roundedEndTime.diff(roundedStartTime, 'hours');
+    
     console.log('roundedStartTime', roundedStartTime);
     console.log('roundedEndTime', roundedEndTime);
     console.log('hours', hours);
     
     for(let i = 1; i <= hours; i++) {
       console.log(i);
+      let p = roundedStartTime.toDate().getTime();
       rawStations.find(station => {
-        const time = moment(station.at);
-        if (time.isBetween(roundedStartTime, roundedStartTime.add('hours', 1))) {
+        const z = moment(station.at).toDate().getTime();
+        const x = p;
+        const y = moment(p + (60 * 60 * 1000)).toDate().getTime()
+
+        console.log('---------------')
+        console.log('x', moment(x).toString())
+        console.log('z', moment(z).toString())
+        console.log('y', moment(y).toString())
+        console.log('---------------')
+
+        if (x <= z && z <= y) {
           console.log('station', station.at)
           records.push(station);
         }
+        p += (60 * 60 * 1000);
       })
     }
   }
 
   if (frequency === TimeFrequency.Daily) {
     
-    const roundedStartTime = a.endOf('days');
-    const roundedEndTime = b.endOf('days');
+    console.log('in days');
+    const roundedStartTime = a.endOf('day');
+    const roundedEndTime = b.endOf('day');
     const days = roundedEndTime.diff(roundedStartTime, 'days');
+    
+    console.log('roundedStartTime', roundedStartTime);
+    console.log('roundedEndTime', roundedEndTime);
+    console.log('days', days);
+    
     for(let i = 1; i <= days; i++) {
       console.log(i);
+      let p = roundedStartTime.toDate().getTime();
       rawStations.find(station => {
-        const time = moment(station.at);
-        if (time.isBetween(roundedStartTime, roundedStartTime.add('days', 1))) {
+        const z = moment(station.at).toDate().getTime();
+        const x = p;
+        const y = moment(p + (60 * 60 * 1000 * 24)).toDate().getTime()
+
+        console.log('---------------')
+        console.log('x', moment(x).toString())
+        console.log('z', moment(z).toString())
+        console.log('y', moment(y).toString())
+        console.log('---------------')
+
+        if (x <= z && z <= y) {
           console.log('station', station.at)
           records.push(station);
         }
+        p += (60 * 60 * 1000 * 24);
       })
     }
+    
   }
-
   return records;
-  
 }
 
 export {
