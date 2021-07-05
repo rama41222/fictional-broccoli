@@ -23,6 +23,10 @@ This application helps to combine the bike-sharing availability data and the wea
 
 [ ] Unit tests are **NOT** implemented due to time constraints
 
+[ ] Implement proper error handling service
+
+[ ] Add Response Types
+
 [ ] Add missing types to certian functions
 
 [ ] Add more functionality to the dashboard and improve CSS

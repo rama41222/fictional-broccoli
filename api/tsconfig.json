@@ -7,7 +7,7 @@
       "outDir": "dist",
       "sourceMap": true,
       "baseUrl": "src",
-      "types": ["reflect-metadata", "jest"],
+      "types": ["jest"],
     },
     "include": [
       "src"

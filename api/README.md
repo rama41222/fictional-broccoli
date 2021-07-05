@@ -32,4 +32,8 @@ yarn run test #runs all the unit tests
 
 [ ] Write more unit tests to increase code coverage
 
+[ ] Implement proper error handling service
+
+[ ] Add Response Types
+
 

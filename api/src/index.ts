@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { connect, DbType } from './library/database';
 import { syncToHost } from './tasks';
+import cors from 'cors';
 import v1 from './modules/v1';
 
 /** fetch from dot env */
@@ -20,6 +21,8 @@ connect(DbType.Mongo)
     console.error("Cron jobs can't be started :=> \n", e.message);
   });
 
+/** Allow cors */
+app.use(cors());
 /** json parser */
 app.use(express.json());
 /** url encoded parser */
