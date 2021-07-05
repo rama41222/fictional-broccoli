@@ -21,7 +21,7 @@
     "dev": "node -r ts-node/register --inspect=0.0.0.0 src/index.ts",
     "dev:server": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index.ts",
     "test": "jest",
-    "doc": "yarn typedoc src/index.ts"
+    "doc": "yarn jsdoc"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.1",

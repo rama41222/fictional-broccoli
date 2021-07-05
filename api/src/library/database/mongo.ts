@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 
+/**
+ * Mongodb connector
+ * @returns Promise<boolean>
+ */
 const mongoDbConnect = async (): Promise<boolean> => {
     return mongoose.connect(process.env.DB_ENDPOINT as string, {
         useNewUrlParser: true,

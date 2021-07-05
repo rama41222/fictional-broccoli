@@ -8,6 +8,17 @@ import Station from './models/station.model';
 import { parseWeather, parseStations } from './station.helper';
 import moment from 'moment-timezone';
 
+/**
+ * This contains the business logic to filter the records by giving a specific Date.
+ * @param  {moment.Moment} at
+ * @param  {number} startPage
+ * @param  {number} noOfpages
+ * @returns { 
+ * Promise<
+ * {at: Date;stations: Partial<StationDocument>[];
+ * weather: Partial<LeanDocument<WeatherDocument>>;
+ * totalPages: number;}>}
+ */
 const fetchRecordsByAt = async (
   at: moment.Moment,
   startPage: number,
@@ -39,6 +50,19 @@ const fetchRecordsByAt = async (
   return { at: timeStamp, stations, weather, totalPages };
 };
 
+/**
+ * This contains the business logic to filter the records by giving a specific Date for a specific kiosk.
+ * @param  {number} id kiosk id
+ * @param  {moment.Moment} at moment date time
+ * @param  {number} startPage pagination start page
+ * @param  {number} noOfpages pagination total number of pages
+ * @returns {Promise<{
+ * at: Date;
+ * stations: Partial<StationDocument>[];
+ * weather: Partial<LeanDocument<WeatherDocument>>;
+ * totalPages: number;
+ * }> }
+ */
 const fetchRecordsByAtById = async (
   id: number,
   at: moment.Moment,
@@ -75,6 +99,14 @@ const fetchRecordsByAtById = async (
   return { at: timeStamp, stations, weather, totalPages };
 };
 
+/**
+ * Fetches stations per kiosk id, per from-to time range of a frequency ['hourly', 'daily']
+ * @param  {number} id kiosk id
+ * @param  {moment.Moment} from from date
+ * @param  {moment.Moment} to to date
+ * @param  {TimeFrequency} frequency ['hourly', 'daily']
+ * @returns {Promise<[] | Partial<StationDocument>[]>}
+ */
 const fetchRecordsByDateRangeAndFrequency = async (
   id: number,
   from: moment.Moment,
@@ -104,6 +136,15 @@ const fetchRecordsByDateRangeAndFrequency = async (
   return result;
 };
 
+/**
+ * Groups a set of records in a certain time range into ['hourly', 'daily']
+ * @param  {number} id kiosk id
+ * @param  {Array<Partial<StationDocument>>} rawStations Array of stations
+ * @param  {moment.Moment} from from time
+ * @param  {moment.Moment} to to time
+ * @param  {TimeFrequency} frequency ['hourly', 'daily']
+ * @returns {Promise<Partial<StationDocument>[]>}
+ */
 const calculateFrequency = async (
   id: number,
   rawStations: Array<Partial<StationDocument>>,

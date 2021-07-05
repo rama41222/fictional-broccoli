@@ -8,6 +8,13 @@ import {
 } from './station.service';
 import { TimeFrequency } from './station.types';
 
+
+/**
+ * This controller will return all stations at user given date time;
+ * @param  {Request} req
+ * @param  {Response} res
+ * @returns {Promise<Response<any>>} Returns all stations
+ */
 const fetchAllStations = async (
   req: Request,
   res: Response
@@ -37,6 +44,14 @@ const fetchAllStations = async (
   }
 };
 
+/**
+ * This method will take a specific time, a time range along with a
+ * frequency to return an array of stations
+ * @param  {Request} req
+ * @param  {Response} res
+ * @returns {Promise<Response<any>>} returns stations array containing weather, 
+ * snapshot time and station information
+ */
 const fetchStationById = async (
   req: Request,
   res: Response
