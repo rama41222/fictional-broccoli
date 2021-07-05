@@ -1,5 +1,7 @@
 # Cycling and Weather
 
+<img src="https://www.pngkit.com/png/full/122-1225439_transparent-cartoon-broccoli.png" width="100"/>
+
 ## Introduction
 
 This application helps to combine the bike-sharing availability data and the weather data in Philadelpia to a single dashboard
