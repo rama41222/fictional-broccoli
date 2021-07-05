@@ -1,6 +1,7 @@
 import React from "react";
 import { ApiRequestData, Frequency } from "../dashboard.types";
 
+// const API_ENDPOINT = "http://localhost:3000/v1/stations";
 const API_ENDPOINT = "http://ec2-52-66-213-231.ap-south-1.compute.amazonaws.com/api/v1/stations";
 
 /**
@@ -22,12 +23,10 @@ const queryStationByAt = async ({ at }: ApiRequestData): Promise<any> => {
  * @param  {Frequency=Frequency.Hourly} frequency
  * @returns Promise
  */
-const queryStationById = async ({ id, at, from, to, frequency  }: ApiRequestData): Promise<any> => {
+const queryStationById = async ({ id, from, to, frequency  }: ApiRequestData): Promise<any> => {
   let queryString = `${id}`;
 
-  if (at) {
-    queryString = `${queryString}?at=${at}`;
-  } else if (from && to) {
+  if (from && to) {
     queryString = `${queryString}?from=${from}&to=${to}&frequency=${frequency}`;
   }
 
