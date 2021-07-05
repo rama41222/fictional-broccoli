@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
 import moment from 'moment-timezone';
+import { toASCII } from 'punycode';
 
 import {
   fetchRecordsByAt,
@@ -136,7 +137,7 @@ const fetchStationById = async (
 
     return res
       .status(404)
-      .json({ message: `No Records found for: ${fromDate} and ${toDate}` });
+      .json({ message: `No Records found for: ${from} and ${to}` });
   } catch (e) {
     return res.status(409).json({ message: e.message });
   }
