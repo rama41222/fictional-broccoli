@@ -29,23 +29,32 @@ const fetchRecordsByAt = async (
   weather: Partial<LeanDocument<WeatherDocument>>;
   totalPages: number;
 }> => {
+  /** Total record count for pagination */
   const totalPages = await Station.countDocuments({
     at: { $gte: at.toDate() },
   });
 
+  /** If no matching records return. */
   if (totalPages <= 0) {
     return { at: at.toDate(), stations: [], weather: {}, totalPages: 0 };
   }
 
+  /** If the count is greater than 0, then fire the main query. */
   const rawStations = await Station.find({ at: { $gte: at.toDate() } })
     .skip(startPage)
     .limit(noOfpages)
     .populate('weather')
     .sort({ at: 1 });
 
+  /** Since weather is common to all stations during a single snapshot,
+   *  get the weatehr from initial record
+   */
   const tempWeather = await rawStations[0].weather.toObject();
+  /** Get the time stamp */
   const timeStamp = await rawStations[0].at;
+  /** Parse the Weather */
   const weather = parseWeather(tempWeather);
+  /** parse the stations, removing unwanted fields */
   const stations = parseStations(rawStations);
   return { at: timeStamp, stations, weather, totalPages };
 };
@@ -74,15 +83,18 @@ const fetchRecordsByAtById = async (
   weather: Partial<LeanDocument<WeatherDocument>>;
   totalPages: number;
 }> => {
+  /** Get the matching record count */
   const totalPages = await Station.countDocuments({
     stationId: id,
     at: { $gte: at.toDate() },
   });
 
+  /** return if zero mathing records */
   if (totalPages <= 0) {
     return { at: at.toDate(), stations: [], weather: {}, totalPages: 0 };
   }
 
+  /** Query by kiosk id at a specific time */
   const rawStations = await Station.find({
     stationId: id,
     at: { $gte: at.toDate() },
@@ -92,9 +104,15 @@ const fetchRecordsByAtById = async (
     .populate('weather')
     .sort({ at: 1 });
 
+  /** Since weather is common to all stations during a single snapshot,
+   *  get the weatehr from initial record
+   */
   const tempWeather = await rawStations[0].weather.toObject();
+  /** Get the time stamp */
   const timeStamp = await rawStations[0].at;
+  /** Parse the weather */
   const weather = parseWeather(tempWeather);
+  /** parse the stations, removing unwanted fields */
   const stations = parseStations(rawStations);
   return { at: timeStamp, stations, weather, totalPages };
 };
@@ -113,6 +131,7 @@ const fetchRecordsByDateRangeAndFrequency = async (
   to: moment.Moment,
   frequency: TimeFrequency
 ): Promise<[] | Partial<StationDocument>[]> => {
+  /** Get the station count per station for a time range */
   const rawStations = await Station.find({
     $and: [
       { stationId: id },
@@ -122,12 +141,15 @@ const fetchRecordsByDateRangeAndFrequency = async (
     .populate('weather')
     .sort({ at: 1 });
 
+  /** Return zero if no records */
   if (!rawStations || rawStations.length <= 0) {
     return [];
   }
 
+  /** calculate the frequency */
   const result = await calculateFrequency(id, rawStations, from, to, frequency);
 
+  /** if no results return an empty array */
   if (!result || result.length <= 0) {
     return [];
   }
@@ -151,49 +173,86 @@ const calculateFrequency = async (
   to: moment.Moment,
   frequency: TimeFrequency
 ): Promise<Partial<StationDocument>[]> => {
+  /** store the records according to the frequency */
   const records: Partial<StationDocument>[] = [];
 
   if (frequency === TimeFrequency.Hourly) {
+    /** parse from to the end of that hour */
     const roundedStartTime = from.endOf('hour');
+
+    /** parse 'to' to the end of that hour */
     const roundedEndTime = to.endOf('hour');
+
+    /** Get the hour difference between from and to */
     const hours = roundedEndTime.diff(roundedStartTime, 'hours');
 
+    /** initialize the start time */
     let p = roundedStartTime.toDate().getTime();
+
+    /** iterate according to number of hours */
     for (let i = 1; i <= hours; i++) {
+      /** check if the station time falls between the range */
       for (const station of rawStations) {
         const z = moment.tz(station.at, 'EST').toDate().getTime();
+
         const x = p;
+
+        /** add one hour in milli seconds to p to get records between 1 hour */
         const y = moment
           .tz(p + 60 * 60 * 1000, 'EST')
           .toDate()
           .getTime();
+
+        /** if the time is inbetween, then push it to records and break
+         * since only the first record has to be shown
+         */
         if (x <= z && z <= y) {
           records.push(station);
           break;
         }
       }
+      /** increate the time by another hour */
       p += 60 * 60 * 1000;
     }
   }
 
   if (frequency === TimeFrequency.Daily) {
+    /** parse from to the end of that day */
     const roundedStartTime = from.endOf('day');
+
+    /** parse to to the end of that day */
     const roundedEndTime = to.endOf('day');
+
+    /** Get the number of days between from and to */
     const days = roundedEndTime.diff(roundedStartTime, 'days');
+
+    /** initialize the start time in milliseconds */
     let p = roundedStartTime.toDate().getTime();
+
+    /** iterate according to number of days */
     for (let i = 1; i <= days; i++) {
+      /** check if the station time falls between the range */
       for (const station of rawStations) {
         const z = moment.tz(station.at, 'EST').toDate().getTime();
+
         const x = p;
+
+        /** add one hour in milliseconds to p to get records between 1 day */
         const y = moment
           .tz(p + 60 * 60 * 1000 * 24, 'EST')
           .toDate()
           .getTime();
+
+        /** if the time is inbetween, then push it to records and break
+         * since only the first record has to be shown
+         */
         if (x <= z && z <= y) {
           records.push(station);
           break;
         }
       }
+
+      /** increate the time by another 24 hours */
       p += 60 * 60 * 1000 * 24;
     }
   }
