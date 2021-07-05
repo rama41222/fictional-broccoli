@@ -6,7 +6,7 @@ import fetch, { Response } from 'node-fetch';
  * @param  {string} url Takes a Weather api endpoint
  * @returns Promise<WeatherDocument{}>
  */
-const fetchWeather = async (url: string): Promise<Response> => {
+const fetchWeather = async (url: string): Promise<any> => {
   const result = await fetch(url).catch((e: any) => {
     throw new e();
   });
