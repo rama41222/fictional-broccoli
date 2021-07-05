@@ -6,7 +6,9 @@ import { WeatherDocument, StationDocument } from './station.types';
  * @param  {LeanDocument<WeatherDocument>} weather Weather Document
  * @returns {Partial<LeanDocument<WeatherDocument>> } Weather Document
  */
-const parseWeather = (weather: LeanDocument<WeatherDocument>): Partial<LeanDocument<WeatherDocument>> => {
+const parseWeather = (
+  weather: LeanDocument<WeatherDocument>
+): Partial<LeanDocument<WeatherDocument>> => {
   Reflect.deleteProperty(weather, '__v');
   Reflect.deleteProperty(weather, '_id');
   Reflect.deleteProperty(weather, 'createdAt');
@@ -19,7 +21,9 @@ const parseWeather = (weather: LeanDocument<WeatherDocument>): Partial<LeanDocum
  * @param  {StationDocument[]} stations
  * @returns {Array<Partial<StationDocument>>} formatted stations array
  */
-const parseStations = (stations: StationDocument[]) : Array<Partial<StationDocument>> => {
+const parseStations = (
+  stations: StationDocument[]
+): Array<Partial<StationDocument>> => {
   return stations.map(({ geometry, properties, type }: StationDocument) => ({
     geometry,
     properties,

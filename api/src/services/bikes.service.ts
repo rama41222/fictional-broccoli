@@ -1,4 +1,3 @@
-
 import moment from 'moment-timezone';
 import fetch, { Response } from 'node-fetch';
 import { TransformType } from './types.service';
@@ -16,7 +15,7 @@ const fetchBikes = async (url: string): Promise<any> => {
 };
 
 /**
- * ``` 
+ * ```
  *  Returns weather data in the following format
  * { feature,
  *  stationId: feature.properties.id,

@@ -1,8 +1,6 @@
-type TransformType =  any;
+type TransformType = any;
 
 /**
  * @exports TransformType
  */
-export {
-    TransformType
-}
+export { TransformType };

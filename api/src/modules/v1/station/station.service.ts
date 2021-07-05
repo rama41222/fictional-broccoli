@@ -13,7 +13,7 @@ import moment from 'moment-timezone';
  * @param  {moment.Moment} at
  * @param  {number} startPage
  * @param  {number} noOfpages
- * @returns { 
+ * @returns {
  * Promise<
  * {at: Date;stations: Partial<StationDocument>[];
  * weather: Partial<LeanDocument<WeatherDocument>>;
@@ -113,7 +113,6 @@ const fetchRecordsByDateRangeAndFrequency = async (
   to: moment.Moment,
   frequency: TimeFrequency
 ): Promise<[] | Partial<StationDocument>[]> => {
-
   const rawStations = await Station.find({
     $and: [
       { stationId: id },
@@ -128,7 +127,7 @@ const fetchRecordsByDateRangeAndFrequency = async (
   }
 
   const result = await calculateFrequency(id, rawStations, from, to, frequency);
-  
+
   if (!result || result.length <= 0) {
     return [];
   }
