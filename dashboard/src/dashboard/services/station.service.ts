@@ -1,7 +1,7 @@
 import React from "react";
 import { ApiRequestData, Frequency } from "../dashboard.types";
 
-const API_ENDPOINT = "http://localhost:3000/v1/stations";
+const API_ENDPOINT = "http://ec2-52-66-213-231.ap-south-1.compute.amazonaws.com/api/v1/stations";
 
 /**
  * @param  {Date} at Query data from

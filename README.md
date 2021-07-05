@@ -2,6 +2,12 @@
 
 <img src="https://www.pngkit.com/png/full/122-1225439_transparent-cartoon-broccoli.png" width="100"/>
 
+## Live URL
+
+* [Dashboard](http://ec2-52-66-213-231.ap-south-1.compute.amazonaws.com)
+
+* [API](http://ec2-52-66-213-231.ap-south-1.compute.amazonaws.com/api/v1/stations)
+
 ## Introduction
 
 This application helps to combine the bike-sharing availability data and the weather data in Philadelpia to a single dashboard
