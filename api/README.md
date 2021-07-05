@@ -29,6 +29,7 @@ yarn run test #runs all the unit tests
 ## Todo
 
 [x] Setup unit tests
+
 [ ] Write more unit tests to increase code coverage
 
 
